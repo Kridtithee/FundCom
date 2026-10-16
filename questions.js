@@ -265,7 +265,7 @@ const QUESTIONS = [
 
 {topic:"Operating System", q:"คำสั่ง mv ใช้ทำอะไร?",
  choices:["ย้ายไฟล์ หรือเปลี่ยนชื่อไฟล์/โฟลเดอร์","ลบไฟล์","คัดลอกไฟล์","สร้างไฟล์"],
- answer:0, explain:"mv = ย้ายไฟล์ หรือเปลี่ยนชื่อไฟล์/โฟลเดอร์ (เทียบเท่า move + rename ใน Windows)"}
+ answer:0, explain:"mv = ย้ายไฟล์ หรือเปลี่ยนชื่อไฟล์/โฟลเดอร์ (เทียบเท่า move + rename ใน Windows)"},
 
 
 // ============================================================
@@ -489,7 +489,7 @@ const QUESTIONS = [
 
 {topic:"Cyber Security", q:"Security Misconfiguration คืออะไร?",
  choices:["การกำหนดค่าเริ่มต้น/ค่าความปลอดภัยไม่เหมาะสม เช่น เปิด Debug mode, ใช้รหัสผ่าน default","การเขียนโค้ดผิด","การลบไฟล์","การอัปเดตระบบ"],
- answer:0, explain:"Security Misconfiguration = ตั้งค่าความปลอดภัยไม่ดี เช่น เปิด Debug, รหัสผ่าน default, พอร์ตไม่จำเป็นเปิดอยู่"}
+ answer:0, explain:"Security Misconfiguration = ตั้งค่าความปลอดภัยไม่ดี เช่น เปิด Debug, รหัสผ่าน default, พอร์ตไม่จำเป็นเปิดอยู่"},
 // ============================================================
 //  รอบที่ 3/6: Database System and Data Management (50 ข้อ)
 // ============================================================
@@ -982,7 +982,7 @@ const QUESTIONS = [
 
 {topic:"SDLC", q:"ข้อใดเป็นข้อเสียของ Traditional (Waterfall)?",
  choices:["รับการเปลี่ยนแปลงยาก ผู้ใช้เห็นระบบช้า พบปัญหาช่วงท้าย","ช้าเกินไป","ไม่มีเอกสาร","ไม่ทดสอบ"],
- answer:0, explain:"Waterfall รับการเปลี่ยนแปลงยาก เห็นระบบช้า และเจอปัญหาตอนท้ายโครงการ"}
+ answer:0, explain:"Waterfall รับการเปลี่ยนแปลงยาก เห็นระบบช้า และเจอปัญหาตอนท้ายโครงการ"},
 // ============================================================
 //  รอบที่ 5/6: Generative AI (50 ข้อ)
 // ============================================================
@@ -1226,7 +1226,7 @@ const QUESTIONS = [
 
 {topic:"Generative AI", q:"GitHub Copilot ใช้ทำอะไร?",
  choices:["สร้างภาพ","ช่วยเขียนโค้ด (Code Generation)","แก้ไวรัส","ตัดต่อวิดีโอ"],
- answer:1, explain:"GitHub Copilot = Generative AI ช่วยเขียนโค้ด แนะนำ completion"}
+ answer:1, explain:"GitHub Copilot = Generative AI ช่วยเขียนโค้ด แนะนำ completion"},
 
 // ============================================================
 //  รอบที่ 6/6: Computational Thinking (50 ข้อ)
@@ -1401,7 +1401,7 @@ const QUESTIONS = [
 
 {topic:"Computational Thinking", q:"สัญลักษณ์สี่เหลี่ยมขนมเปียกปูน (Diamond) ใน Flowchart ใช้แทนอะไร?",
  choices:["Process","Decision (การตัดสินใจ)","Input/Output","Start/Stop"],
- answer:1, explain:"Diamond = Decision (การตัดสินใจ) มีทางออก 2 ทาง"}],
+ answer:1, explain:"Diamond = Decision (การตัดสินใจ) มีทางออก 2 ทาง"},
 
 {topic:"Computational Thinking", q:"สัญลักษณ์สี่เหลี่ยมด้านขนาน (Parallelogram) ใน Flowchart ใช้แทนอะไร?",
  choices:["Process","Decision","Input/Output","Start/Stop"],
@@ -1427,7 +1427,7 @@ const QUESTIONS = [
 // ---------- กลุ่มที่ 9: Control Structures (Sequence/Selection/Iteration) (6 ข้อ) ----------
 {topic:"Computational Thinking", q:"Flowchart ที่ดีมีกี่จุดเริ่มต้นและจุดสิ้นสุด?",
  choices:["หลายจุดเท่าที่ต้องการ","1 จุดเริ่มต้น 1 จุดสิ้นสุด","ไม่มี","2 จุด"],
- answer:1, explain:"Flowchart ที่ดีมี 1 จุดเริ่มต้น และ 1 จุดสิ้นสุด"}],
+ answer:1, explain:"Flowchart ที่ดีมี 1 จุดเริ่มต้น และ 1 จุดสิ้นสุด"},
 
 {topic:"Computational Thinking", q:"Control Structure มี 3 ลักษณะ ข้อใด ไม่ถูกต้อง?",
  choices:["Sequence","Selection","Iteration","Recursion"],
