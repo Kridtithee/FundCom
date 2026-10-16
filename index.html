@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FundCom - ทบทวนข้อสอบ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== หน้าแรก ========== -->
+<div id="home">
+  <h1>📚 FundCom</h1>
+  <p class="small">ทบทวนข้อสอบ Fundamental of Computer Science</p>
+
+  <div class="box" id="homeStats"></div>
+
+  <h2>เลือกหัวข้อ</h2>
+  <div id="topicList"></div>
+
+  <hr>
+  <button onclick="startQuiz('all')">🎲 สุ่มทุกหัวข้อ</button>
+  <button onclick="startWrongQuiz()">🔁 ทบทวนข้อที่ผิด</button>
+  <button onclick="resetProgress()">🗑 รีเซ็ตทั้งหมด</button>
+</div>
+
+<!-- ========== หน้าเล่นข้อสอบ ========== -->
+<div id="quiz" class="hidden">
+  <div class="stats" id="quizProgress"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <h2 id="questionText"></h2>
+  <div id="choices"></div>
+  <div id="feedback" class="hidden"></div>
+
+  <hr>
+  <button id="nextBtn" class="hidden" onclick="nextQuestion()">ข้อต่อไป →</button>
+  <button onclick="goHome()">← กลับหน้าแรก</button>
+</div>
+
+<!-- ========== หน้าสรุปผล ========== -->
+<div id="result" class="hidden">
+  <h1>📊 สรุปผล</h1>
+  <div class="box" id="resultText"></div>
+  <button onclick="retry()">🔁 เล่นอีกครั้ง</button>
+  <button onclick="goHome()">← กลับหน้าแรก</button>
+</div>
+
+<footer>FundCom · ใช้คนเดียว · ข้อมูลเก็บบนเครื่องคุณ</footer>
+
+<script src="questions.js"></script>
+<script>
+// =========================================================
+//  State & Storage
+// =========================================================
+const LS_STATS = 'fundcom_stats';
+const LS_WRONG = 'fundcom_wrong';
+
+let state = {
+  currentList: [],
+  index: 0,
+  correct: 0,
+  answered: false
+};
+
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(LS_STATS)) || {}; }
+  catch(e) { return {}; }
+}
+function saveStats(s) { localStorage.setItem(LS_STATS, JSON.stringify(s)); }
+
+function loadWrong() {
+  try { return JSON.parse(localStorage.getItem(LS_WRONG)) || []; }
+  catch(e) { return []; }
+}
+function saveWrong(w) { localStorage.setItem(LS_WRONG, JSON.stringify(w)); }
+
+function addWrong(i) {
+  const w = loadWrong();
+  if (!w.includes(i)) { w.push(i); saveWrong(w); }
+}
+function removeWrong(i) {
+  saveWrong(loadWrong().filter(x => x !== i));
+}
+
+// =========================================================
+//  Home
+// =========================================================
+function renderHome() {
+  document.getElementById('home').classList.remove('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+
+  const stats = loadStats();
+  const topics = getAllTopics();
+  let html = '<b>สถิติรวม</b><br>';
+  topics.forEach(t => {
+    const s = stats[t] || { correct: 0, total: 0 };
+    const pct = s.total ? Math.round(s.correct / s.total * 100) : 0;
+    html += `• ${t}: ${s.correct}/${s.total} (${pct}%)<br>`;
+  });
+  html += `<br>📌 ข้อที่ต้องทบทวน: <b>${loadWrong().length}</b> ข้อ`;
+  html += `<br>📝 ข้อสอบทั้งหมด: <b>${QUESTIONS.length}</b> ข้อ`;
+  document.getElementById('homeStats').innerHTML = html;
+
+  const topicList = document.getElementById('topicList');
+  topicList.innerHTML = '';
+  topics.forEach(t => {
+    const count = QUESTIONS.filter(q => q.topic === t).length;
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.innerHTML = `${t} <span class="small">(${count} ข้อ)</span>`;
+    btn.onclick = () => startQuiz(t);
+    topicList.appendChild(btn);
+  });
+}
+
+function getAllTopics() {
+  const set = new Set();
+  QUESTIONS.forEach(q => set.add(q.topic));
+  return Array.from(set);
+}
+
+// =========================================================
+//  Quiz
+// =========================================================
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(topic) {
+  let list;
+  if (topic === 'all') {
+    list = QUESTIONS.map((_, i) => i);
+  } else {
+    list = QUESTIONS.map((q, i) => q.topic === topic ? i : -1).filter(i => i >= 0);
+  }
+  state.currentList = shuffle(list);
+  state.index = 0;
+  state.correct = 0;
+  state.answered = false;
+
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function startWrongQuiz() {
+  const wrong = loadWrong();
+  if (wrong.length === 0) { alert('ยังไม่มีข้อที่ตอบผิด 🎉'); return; }
+  state.currentList = shuffle(wrong);
+  state.index = 0;
+  state.correct = 0;
+  state.answered = false;
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const qIndex = state.currentList[state.index];
+  const q = QUESTIONS[qIndex];
+  state.answered = false;
+
+  const total = state.currentList.length;
+  document.getElementById('quizProgress').textContent =
+    `ข้อ ${state.index + 1}/${total} · ตอบถูก ${state.correct} · ${q.topic}`;
+  document.getElementById('progressFill').style.width =
+    `${(state.index / total) * 100}%`;
+
+  document.getElementById('questionText').textContent = q.q;
+
+  const choicesDiv = document.getElementById('choices');
+  choicesDiv.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.textContent = `${i + 1}. ${c}`;
+    btn.onclick = () => answerQuestion(i);
+    choicesDiv.appendChild(btn);
+  });
+
+  document.getElementById('feedback').classList.add('hidden');
+  document.getElementById('nextBtn').classList.add('hidden');
+}
+
+function answerQuestion(selected) {
+  if (state.answered) return;
+  state.answered = true;
+
+  const qIndex = state.currentList[state.index];
+  const q = QUESTIONS[qIndex];
+  const buttons = document.querySelectorAll('#choices .choice');
+
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add('correct');
+    if (i === selected && selected !== q.answer) btn.classList.add('wrong');
+  });
+
+  const isCorrect = selected === q.answer;
+
+  const stats = loadStats();
+  if (!stats[q.topic]) stats[q.topic] = { correct: 0, total: 0 };
+  stats[q.topic].total++;
+  if (isCorrect) {
+    state.correct++;
+    stats[q.topic].correct++;
+    removeWrong(qIndex);
+  } else {
+    addWrong(qIndex);
+  }
+  saveStats(stats);
+
+  const fb = document.getElementById('feedback');
+  fb.classList.remove('hidden');
+  fb.innerHTML = `
+    <div class="box"><b>${isCorrect ? '✅ ถูกต้อง' : '❌ ผิด'}</b></div>
+    <div class="explanation"><b>เฉลย:</b> ${q.choices[q.answer]}<br><br>
+    <b>อธิบาย:</b> ${q.explain}</div>
+  `;
+
+  document.getElementById('nextBtn').classList.remove('hidden');
+}
+
+function nextQuestion() {
+  state.index++;
+  if (state.index >= state.currentList.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('result').classList.remove('hidden');
+  const total = state.currentList.length;
+  const pct = Math.round(state.correct / total * 100);
+  let comment = pct >= 80 ? '🎉 เก่งมาก!' : pct >= 60 ? '👍 พอใช้ได้' : '📚 ทบทวนเพิ่มอีก';
+  document.getElementById('resultText').innerHTML =
+    `ตอบถูก <b>${state.correct}/${total}</b> ข้อ (${pct}%)<br><br>${comment}`;
+}
+
+function retry() {
+  state.index = 0;
+  state.correct = 0;
+  state.answered = false;
+  state.currentList = shuffle(state.currentList);
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function goHome() { renderHome(); }
+
+function resetProgress() {
+  if (!confirm('ลบคะแนนและประวัติทั้งหมด?')) return;
+  localStorage.removeItem(LS_STATS);
+  localStorage.removeItem(LS_WRONG);
+  renderHome();
+}
+
+// =========================================================
+renderHome();
+</script>
+</body>
+</html>
