@@ -59,6 +59,36 @@ const STUDY = {
         ["3. No Preemption", "แย่งทรัพยากรคืนไม่ได้ ต้องรอคืนเอง"],
         ["4. Circular Wait", "รอเป็นวงกลม (A รอ B, B รอ A)"],
       ] },
+    { type: "table", title: "🗓️ CPU Scheduling: 4 อัลกอริทึม",
+      headers: ["อัลกอริทึม", "หลักการเลือก", "จุดเด่น/ข้อควรระวัง"],
+      rows: [
+        ["FCFS", "มาก่อนได้ก่อน (คิว)", "ยุติธรรมแต่งานสั้นอาจต้องรองานยาว (convoy effect)"],
+        ["SJF", "งานที่ใช้ CPU สั้นที่สุดก่อน", "รอเฉลี่ยน้อยสุด แต่ต้องรู้เวลาล่วงหน้า"],
+        ["Priority", "ความสำคัญสูงสุดก่อน", "ระวัง <b>starvation</b> — งานสำคัญน้อยไม่ได้ทำสักที"],
+        ["Round-Robin", "แบ่ง <b>time quantum</b> เท่าๆ กัน วนคิว", "หัวใจของ <b>Time-Sharing</b> — ทุกคนได้ใช้"],
+      ] },
+    { type: "table", title: "🧩 การจัดสรรหน่วยความจำ (Multiprogramming)",
+      headers: ["แบบ", "วิธีแบ่ง", "ปัญหาที่ตามมา"],
+      rows: [
+        ["Fixed Partition", "แบ่งช่องขนาดคงที่", "<b>Internal Fragmentation</b> — เศษเหลือในช่องใช้ไม่ได้"],
+        ["Dynamic Partition", "แบ่งตามขนาดงานจริง", "ช่องว่างย่อยกระจัดกระจาย → ต้อง <b>Compaction</b> (เลื่อนมาชิดกัน)"],
+        ["Paging", "แบ่ง RAM เป็น Frame / โปรแกรมเป็น Page ขนาดเท่ากัน", "1 Page = 1 Frame เสมอ — คู่กับ Virtual Memory"],
+      ] },
+    { type: "table", title: "🔌 อุปกรณ์ 2 ประเภท",
+      headers: ["ประเภท", "ลักษณะ", "ตัวอย่าง"],
+      rows: [
+        ["Block Device", "อ่าน/เขียนเป็นบล็อกๆ เข้าถึงแบบสุ่มได้", "ฮาร์ดดิสก์, SSD"],
+        ["Character Device", "ส่งข้อมูลเป็นสายตามลำดับ", "คีย์บอร์ด, สแกนเนอร์"],
+      ] },
+    { type: "example", title: "✍️ ตัวอย่างข้อสอบ + วิธีคิด",
+      items: [
+        { q: "โปรเซส A ถือสแกนเนอร์แล้วรอเครื่องพิมพ์ ส่วนโปรเซส B ถือเครื่องพิมพ์แล้วรอสแกนเนอร์ — เกิดอะไรขึ้น?",
+          thinking: "ถามหาสภาวะ → เช็ก 4 เงื่อนไข Deadlock: ถือของเดิม+ขอของใหม่ (Hold and Wait) ✓ แย่งคืนไม่ได้ (No Preemption) ✓ รอกันเป็นวง (Circular Wait) ✓ → ครบ",
+          answer: "Deadlock" },
+        { q: "ระบบต้องให้ผู้ใช้ 20 คนใช้งานพร้อมกันอย่างโต้ตอบได้ ควรใช้ scheduling แบบใด?",
+          thinking: "คีย์เวิร์ด 'หลายคน + โต้ตอบได้' = Time-Sharing → scheduling ที่คู่กันคือ Round-Robin (แบ่ง time quantum เท่าๆ กัน)",
+          answer: "Round-Robin" },
+      ] },
     { type: "points", title: "📌 คำศัพท์ต้องจำ",
       items: [
         "<b>Buffering</b> ใช้ <b>RAM</b> พักข้อมูลชั่วคราว — <b>Spooling</b> ใช้ <b>ดิสก์</b> (จำสลับกันคือโดนหลอก)",
@@ -118,6 +148,31 @@ const STUDY = {
         <div class="d-node d-hi">💾 เข้ารหัสข้อมูล + Backup <span class="d-sub">ด่านสุดท้าย: ข้อมูล</span></div>
       </div>
       <p class="d-note">หลักคิด: ไม่มีกำแพงชั้นเดียวที่กันได้หมด — ทะลุชั้นหนึ่งต้องเจออีกชั้น</p>` },
+    { type: "table", title: "👤 Access Control: ใครทำอะไรได้บ้าง",
+      headers: ["ขั้นตอน", "ความหมาย", "ตัวอย่าง"],
+      rows: [
+        ["Authentication", "พิสูจน์ตัวตน (ใช่ตัวจริงไหม)", "รหัสผ่าน, OTP, สแกนนิ้ว — ยิ่งหลาย factor ยิ่งดี (MFA)"],
+        ["Authorization", "กำหนดสิทธิ์ (ทำอะไรได้บ้าง)", "พนักงานทั่วไปอ่านได้อย่างเดียว แอดมินลบได้"],
+        ["Accounting", "บันทึกว่าใครทำอะไร", "log การเข้าใช้งาน"],
+      ] },
+    { type: "table", title: "🌐 เครื่องมือป้องกันเครือข่าย",
+      headers: ["เครื่องมือ", "หน้าที่"],
+      rows: [
+        ["Firewall", "กรองทราฟฟิกเข้า-ออกตามกฎ (ด่านแรก)"],
+        ["IDS", "ตรวจจับความผิดปกติแล้ว<b>แจ้งเตือน</b>"],
+        ["IPS", "ตรวจจับแล้ว<b>สกัดกั้น</b>ได้ทันที"],
+        ["VPN", "สร้างอุโมงค์เข้ารหัสสำหรับสื่อสารทางไกล"],
+        ["Antivirus", "ตรวจ-กำจัดมัลแวร์ในเครื่อง"],
+      ] },
+    { type: "example", title: "✍️ ตัวอย่างข้อสอบ + วิธีคิด",
+      items: [
+        { q: "พนักงานได้รับอีเมลจาก 'ธนาคาร' ระบุชื่อ-ตำแหน่งของตนถูกต้อง ขอให้กดลิงก์กรอกรหัสผ่าน — นี่คืออะไร?",
+          thinking: "อีเมลปลอมขอข้อมูล = Phishing แต่ระบุ 'ชื่อ-ตำแหน่งถูกต้อง' = ศึกษาข้อมูลเหยื่อมาก่อน → อัพเกรดเป็น Spear Phishing",
+          answer: "Spear Phishing" },
+        { q: "บริษัทอยากให้พนักงานล็อกอินด้วยรหัสผ่าน + OTP — เป็นการป้องกันตามหลักใด?",
+          thinking: "ใช้หลักฐาน 2 ปัจจัย (สิ่งที่รู้ + สิ่งที่มี) = Two-factor Authentication ขั้นตอน Authentication ของ Access Control",
+          answer: "2FA / Authentication" },
+      ] },
     { type: "points", title: "📌 คำศัพท์ต้องจำ",
       items: [
         "<b>Phishing</b> = อีเมล/เว็บปลอมหว่านแห — <b>Spear Phishing</b> = เจาะจงเป้าหมาย ศึกษาข้อมูลมาก่อน",
@@ -191,6 +246,50 @@ const STUDY = {
         ["DDL", "CREATE · ALTER · DROP", "นิยาม/แก้ <b>โครงสร้าง</b>"],
         ["DML", "SELECT · INSERT · UPDATE · DELETE", "จัดการ <b>ข้อมูล</b> ข้างใน"],
       ] },
+    { type: "diagram", title: "🏛️ สถาปัตยกรรม ANSI/SPARC 3 ระดับ",
+      html: `<div class="d-stack">
+        <div class="d-node">👁️ External Level<span class="d-sub">มุมมองผู้ใช้ — เห็นเฉพาะข้อมูลที่ต้องใช้</span></div><div class="d-arrow-v">▼</div>
+        <div class="d-node d-hi">🗂️ Conceptual Level<span class="d-sub">โครงสร้างหลัก — ตาราง + ความสัมพันธ์</span></div><div class="d-arrow-v">▼</div>
+        <div class="d-node">💽 Internal Level<span class="d-sub">กายภาพ — เก็บจริงบนดิสก์อย่างไร</span></div>
+      </div>
+      <p class="d-note">แยก 3 ชั้น = เปลี่ยนชั้นล่างได้โดยชั้นบน (user view) ไม่พัง → <b>Data Independence</b></p>` },
+    { type: "table", title: "🗂️ Database Models 3 แบบ",
+      headers: ["โมเดล", "โครงสร้าง", "จุดเด่น/จุดด้อย"],
+      rows: [
+        ["Hierarchical", "ต้นไม้กลับหัว — 1 entity มี parent ได้ตัวเดียว", "ค้นหาง่าย แต่<b>ไม่รองรับ M:N</b>"],
+        ["Network", "เครือข่าย — มี parent ได้หลายตัว", "ยืดหยุ่นกว่า แต่ซับซ้อน"],
+        ["Relational", "ตาราง 2 มิติ", "นิยมที่สุด (MySQL, PostgreSQL, Oracle)"],
+      ] },
+    { type: "diagram", title: "♻️ Data Lifecycle 7 ขั้นตอน",
+      html: `<div class="d-flow d-wrap">
+        <div class="d-step"><b>1</b> Collect</div><div class="d-arrow">→</div>
+        <div class="d-step"><b>2</b> Store</div><div class="d-arrow">→</div>
+        <div class="d-step"><b>3</b> Process</div><div class="d-arrow">→</div>
+        <div class="d-step"><b>4</b> Use</div><div class="d-arrow">→</div>
+        <div class="d-step"><b>5</b> Share</div><div class="d-arrow">→</div>
+        <div class="d-step"><b>6</b> Archive</div><div class="d-arrow">→</div>
+        <div class="d-step d-hi"><b>7</b> Delete</div>
+      </div>
+      <p class="d-note">จำหัว-ท้าย: เริ่ม <b>Collect</b> จบ <b>Delete</b></p>` },
+    { type: "table", title: "✨ Data Quality 6 มิติ",
+      headers: ["มิติ", "ความหมายสั้นๆ"],
+      rows: [
+        ["Accuracy", "ถูกต้องตรงข้อเท็จจริง"],
+        ["Completeness", "ครบถ้วนไม่ขาด"],
+        ["Consistency", "สอดคล้องกันทุกระบบ"],
+        ["Timeliness", "เป็นปัจจุบันทันใช้"],
+        ["Validity", "อยู่ในรูปแบบ/ช่วงที่กำหนด"],
+        ["Uniqueness", "ไม่ซ้ำซ้อน"],
+      ] },
+    { type: "example", title: "✍️ ตัวอย่างข้อสอบ + วิธีคิด",
+      items: [
+        { q: "ตารางนักศึกษา มีคอลัมน์ 'วิชาที่ลงทะเบียน' เก็บ 'CS101, CS102, CS103' ในช่องเดียว — ผิดหลักใด?",
+          thinking: "ช่องเดียวเก็บหลายค่า = ไม่ atomic → ผิด 1NF (กฎข้อแรกของ normalization) ต้องแตกเป็นแถวละวิชา",
+          answer: "ผิด 1NF" },
+        { q: "DBA เปลี่ยนวิธีเก็บไฟล์บนดิสก์ แต่โปรแกรมของผู้ใช้ยังทำงานได้ปกติ — อธิบายด้วยหลักใด?",
+          thinking: "เปลี่ยน Internal (กายภาพ) แล้ว External/Conceptual ไม่กระทบ = Data Independence จากสถาปัตยกรรม ANSI/SPARC",
+          answer: "Data Independence" },
+      ] },
     { type: "points", title: "📌 คำศัพท์ต้องจำ",
       items: [
         "<b>Anomaly 3 แบบ:</b> Insert (เพิ่มไม่ได้) / Update (แก้ไม่ครบ) / Delete (ลบแล้วของอื่นหาย) — แก้ด้วย normalization",
@@ -253,6 +352,21 @@ const STUDY = {
         <div class="d-step d-hi">UAT<span class="d-sub">ผู้ใช้จริงทดสอบ</span></div>
       </div>
       <p class="d-note"><b>Regression</b> = ทดสอบย้อนว่าของเดิมไม่พังหลังแก้/เพิ่มฟีเจอร์</p>` },
+    { type: "table", title: "🧪 Functional vs Non-Functional Testing",
+      headers: ["ประเภท", "ทดสอบอะไร", "ตัวอย่าง"],
+      rows: [
+        ["Functional", "ระบบทำตามที่สเปกบอกไหม", "Unit, Integration, System, UAT"],
+        ["Non-Functional", "ทำได้<i>ดีแค่ไหน</i> (คุณภาพ)", "Performance, Load, Security, Usability"],
+      ] },
+    { type: "example", title: "✍️ ตัวอย่างข้อสอบ + วิธีคิด",
+      items: [
+        { q: "ลูกค้าบอก requirement เปลี่ยนทุกสัปดาห์ แต่อยากเห็นของใช้ได้เร็วๆ — ควรเลือกโมเดลใด?",
+          thinking: "คีย์เวิร์ด 'เปลี่ยนบ่อย + เห็นของเร็ว' = ตรงข้าม Waterfall (ที่ต้องนิ่ง+ส่งทีเดียวตอนจบ) → Agile (sprint สั้น ส่งทีละส่วน)",
+          answer: "Agile" },
+        { q: "หลังเพิ่มฟีเจอร์ใหม่ ต้องทดสอบว่าปุ่มเดิมยังกดได้ — นี่คือการทดสอบแบบใด?",
+          thinking: "'ของเดิมยังใช้ได้หลังเปลี่ยน' = นิยามของ Regression Testing (กัน 'แก้หนึ่งพังสิบ')",
+          answer: "Regression Testing" },
+      ] },
     { type: "points", title: "📌 คำศัพท์ต้องจำ",
       items: [
         "<b>Sprint</b> = รอบทำงานสั้นๆ แบบ time-boxed (1–4 สัปดาห์) จบต้องมีของส่งมอบ",
@@ -313,6 +427,42 @@ const STUDY = {
         ["Narrow AI (ANI)", "เก่งเฉพาะทาง (แนะนำหนัง, แปลภาษา)", "✅ มีอยู่จริงทุกวันนี้"],
         ["General AI (AGI)", "ฉลาดรอบด้านเท่ามนุษย์", "🔬 ยังไม่มีจริง"],
         ["Super AI (ASI)", "ฉลาดกว่ามนุษย์ทุกด้าน", "🔮 ทฤษฎี"],
+      ] },
+    { type: "diagram", title: "⚙️ ML Development Lifecycle 6 ขั้น",
+      html: `<div class="d-flow d-wrap">
+        <div class="d-step"><b>1</b> Data Gathering<span class="d-sub">กำหนดปัญหา+รวบรวมข้อมูล</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>2</b> Data Preparation<span class="d-sub">cleaning + แบ่ง 70/15/15</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>3</b> Modeling<span class="d-sub">เลือก+ฝึกโมเดล</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>4</b> Evaluation<span class="d-sub">วัด Accuracy/Precision/Recall/F1</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>5</b> Deployment<span class="d-sub">เอาไปใช้จริง</span></div><div class="d-arrow">→</div>
+        <div class="d-step d-hi"><b>6</b> Monitoring<span class="d-sub">เฝ้า data drift → retrain</span></div>
+      </div>` },
+    { type: "diagram", title: "🔤 LLM อ่านข้อความอย่างไร (pipeline)",
+      html: `<div class="d-flow d-wrap">
+        <div class="d-step">ข้อความ<span class="d-sub">\"สวัสดีครับ\"</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>Tokenization</b><span class="d-sub">หั่นเป็น token ย่อย</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>Embedding</b><span class="d-sub">แปลงเป็นเวกเตอร์ตัวเลข</span></div><div class="d-arrow">→</div>
+        <div class="d-step d-hi"><b>Transformer</b><span class="d-sub">ทำนาย token ถัดไป</span></div>
+      </div>
+      <p class="d-note">LLM = เครื่องเดาคำต่อที่เก่งมาก (next token prediction) — ไม่ได้ \"รู้\" ความจริง</p>` },
+    { type: "table", title: "🤝 Responsible AI: 6 หลัก",
+      headers: ["หลัก", "ใจความ"],
+      rows: [
+        ["Verify", "ตรวจสอบข้อเท็จจริงเสมอ (กัน hallucination)"],
+        ["Protect", "ไม่ป้อนข้อมูลส่วนตัว/ความลับ"],
+        ["Be Transparent", "เปิดเผยว่าใช้ AI ช่วย"],
+        ["Respect Copyright", "เคารพลิขสิทธิ์ ให้เครดิต"],
+        ["Human Oversight", "มนุษย์ตัดสินใจขั้นสุดท้าย"],
+        ["Use Appropriate Tools", "เลือกเครื่องมือให้เหมาะงาน"],
+      ] },
+    { type: "example", title: "✍️ ตัวอย่างข้อสอบ + วิธีคิด",
+      items: [
+        { q: "นักศึกษาถาม AI เรื่องกฎหมายแล้วคัดลอกไปส่งอาจารย์เลยโดยไม่ตรวจ — ผิดหลักใด?",
+          thinking: "AI อาจ hallucinate → ต้อง 'ตรวจสอบข้อเท็จจริงเสมอ' = หลัก Verify (และควร Be Transparent ว่าใช้ AI ช่วย)",
+          answer: "Verify" },
+        { q: "โมเดลทำนายแม่น 99% บนข้อมูลฝึก แต่เจอข้อมูลใหม่ทำได้แย่ — เกิดอะไร? แก้อย่างไร?",
+          thinking: "จำข้อมูลฝึกเกินไป = Overfitting (ตรงข้าม Underfitting ที่เรียนไม่พอ) → แก้ด้วยข้อมูลเพิ่ม/regularization/แบ่ง validation",
+          answer: "Overfitting" },
       ] },
     { type: "points", title: "📌 คำศัพท์ต้องจำ",
       items: [
@@ -385,6 +535,32 @@ const STUDY = {
       rows: [
         ["ตรวจเงื่อนไข", "ก่อนทำ", "หลังทำ"],
         ["รันขั้นต่ำ", "0 ครั้งได้", "อย่างน้อย 1 ครั้งเสมอ"],
+      ] },
+    { type: "diagram", title: "🪜 กระบวนการแก้ปัญหา 6 ขั้นตอน",
+      html: `<div class="d-flow d-wrap">
+        <div class="d-step"><b>1</b> Understand<span class="d-sub">เข้าใจปัญหา (ถามอะไร?)</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>2</b> Analyze<span class="d-sub">วิเคราะห์ (ข้อมูลอะไรบ้าง?)</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>3</b> Find Root Cause<span class="d-sub">หาสาเหตุที่แท้จริง</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>4</b> Plan<span class="d-sub">วางแผน (ทำอย่างไร?)</span></div><div class="d-arrow">→</div>
+        <div class="d-step"><b>5</b> Implement<span class="d-sub">ลงมือทำ</span></div><div class="d-arrow">→</div>
+        <div class="d-step d-hi"><b>6</b> Evaluate<span class="d-sub">ประเมินผล — ไม่ผ่านกลับไปแก้</span></div>
+      </div>
+      <p class="d-note">ระวังกับดัก: \"ไม่สามารถลงทะเบียนได้\" เป็น <b>อาการ (symptom)</b> ไม่ใช่ root cause</p>` },
+    { type: "table", title: "➗ Operators ที่ต้องจำ",
+      headers: ["กลุ่ม", "สัญลักษณ์", "ความหมาย"],
+      rows: [
+        ["เปรียบเทียบ", "== &nbsp; != &nbsp; &gt; &nbsp; &lt; &nbsp; &gt;= &nbsp; &lt;=", "เท่ากับ / ไม่เท่ากับ / มากกว่า / น้อยกว่า / ..."],
+        ["คณิตศาสตร์", "+ &nbsp; - &nbsp; * &nbsp; / &nbsp; <b>%</b>", "บวก ลบ คูณ หาร และ <b>% = เศษจากการหาร (modulo)</b>"],
+        ["ตรรกะ", "AND &nbsp; OR &nbsp; NOT", "และ / หรือ / นิเสธ — ใช้ในเงื่อนไข if/while"],
+      ] },
+    { type: "example", title: "✍️ ตัวอย่างข้อสอบ + วิธีคิด",
+      items: [
+        { q: "จะเขียนโปรแกรมหาค่าเฉลี่ยคะแนน แต่ยังไม่รู้ว่ารับคะแนนกี่วิชา — ขั้นใดของ CT ควรทำก่อน?",
+          thinking: "ยังไม่รู้ input ชัด = ปัญหายังไม่ถูกแยกย่อย → เริ่มที่ Decomposition (แตกปัญหาก่อน) แล้วค่อย IPO/Algorithm",
+          answer: "Decomposition" },
+        { q: "ใน flowchart เจอสัญลักษณ์ ◇ แล้วมีลูกศรออก 2 ทาง — ควรเขียนโค้ดด้วยโครงสร้างใด?",
+          thinking: "◇ = Decision (ตัดสินใจ) → ในโค้ดคือ Selection ใช้ if-else (ทางหนึ่งทำ A อีกทางทำ B)",
+          answer: "Selection (if-else)" },
       ] },
     { type: "points", title: "📌 คำศัพท์ต้องจำ",
       items: [

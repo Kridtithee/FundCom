@@ -82,12 +82,6 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-ghost { background: transparent; border-style: dashed; }
 .btn-danger-ghost { color: var(--bad); border-color: var(--bad); background: transparent; }
 
-#themeSelector {
-  padding: 8px 12px; border-radius: 10px; border: 1px solid var(--btn-border);
-  background: var(--btn-bg); color: var(--btn-text);
-  font-family: inherit; font-size: 13px; cursor: pointer; margin: 0;
-}
-.topbar { display: flex; justify-content: flex-end; margin-bottom: 4px; }
 .hero { text-align: center; margin-bottom: 18px; }
 .hero h1 { font-size: 30px; }
 
@@ -198,10 +192,38 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .tbl thead tr:first-child th:first-child { border-radius: 10px 0 0 0; }
 .tbl thead tr:first-child th:last-child { border-radius: 0 10px 0 0; }
 
+/* ---- worked example cards ---- */
+.ex-card {
+  background: var(--card-bg); border: 1px solid var(--btn-border);
+  border-radius: 12px; padding: 14px 16px; margin: 12px 0;
+}
+.ex-card:last-child { margin-bottom: 0; }
+.ex-q { font-weight: 700; color: var(--text-heading); margin-bottom: 8px; }
+.ex-think { font-size: 13.5px; color: var(--text-main); margin-bottom: 8px;
+  border-left: 3px solid var(--accent); padding-left: 10px; }
+.ex-a { font-size: 14px; color: var(--good); }
+
+/* ---- matching mode ---- */
+.match-container { display: flex; gap: 12px; }
+.match-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.match-item {
+  padding: 13px 12px; background: var(--card-bg);
+  border: 2px solid var(--btn-border); border-radius: 12px;
+  cursor: pointer; text-align: center; transition: all 0.18s;
+  font-size: 13.5px; color: var(--text-main); font-weight: 500;
+}
+.match-item.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--text-heading); }
+.match-item.matched {
+  opacity: 0.45; pointer-events: none;
+  background: var(--good-bg); border-color: var(--good);
+}
+.match-item.wrong-flash { border-color: var(--bad); background: var(--bad-bg); }
+
 /* ============ Mode select ============ */
 .mode-hero { text-align: center; margin: 30px 0 20px; }
 .mode-icon { font-size: 52px; }
-.mode-row { display: flex; gap: 12px; margin-bottom: 18px; }
+.mode-row { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.mode-btn { min-width: 140px; }
 .mode-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 26px 12px; font-size: 15px;

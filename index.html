@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +10,6 @@
 
 <!-- ============ หน้าแรก ============ -->
 <section id="page-home" class="page">
-  <div class="topbar">
-    <div></div>
-    <select id="themeSelector" onchange="changeTheme(this.value)" aria-label="เลือกธีม">
-      <option value="pastel">🌸 Pastel</option>
-      <option value="dark">🌙 Dark</option>
-      <option value="ocean">🌊 Ocean</option>
-      <option value="forest">🌿 Forest</option>
-    </select>
-  </div>
-
   <header class="hero">
     <h1>📚 FundCom</h1>
     <p class="small">ทบทวนข้อสอบ Fundamental of Computer Science</p>
@@ -60,6 +50,9 @@
     </button>
     <button class="mode-btn" onclick="playMode('choice')">
       <span class="mode-emoji">📝</span><b>ปรนัย</b><span class="small">เลือกคำตอบที่ถูก</span>
+    </button>
+    <button class="mode-btn" onclick="playMode('matching')">
+      <span class="mode-emoji">🧩</span><b>จับคู่</b><span class="small">เล่นทีละ 4 คู่</span>
     </button>
   </div>
   <button class="btn-ghost" onclick="goHome()">← กลับหน้าแรก</button>
@@ -110,6 +103,19 @@
   <button class="btn-ghost" onclick="goHome()">← กลับหน้าแรก</button>
 </section>
 
+<!-- ============ โหมดจับคู่ ============ -->
+<section id="page-matching" class="page hidden">
+  <div class="stats" id="matchProgress"></div>
+  <h2 class="text-center">🧩 จับคู่คำถามกับคำตอบ</h2>
+  <p class="small text-center" style="margin-bottom:14px">แตะคำถามฝั่งซ้าย แล้วแตะคำตอบที่ถูกต้องฝั่งขวา · จับคู่พลาดจะถูกเพิ่มใน “ยังไม่แม่น”</p>
+  <div class="match-container">
+    <div class="match-col" id="matchLeft"></div>
+    <div class="match-col" id="matchRight"></div>
+  </div>
+  <button id="matchNextBtn" class="hidden" onclick="nextMatchBatch()" style="width:100%;padding:15px;margin-top:14px">ชุดถัดไป →</button>
+  <button class="btn-ghost" onclick="goHome()" style="margin-top:12px">← กลับหน้าแรก</button>
+</section>
+
 <!-- ============ หน้าสรุปผล ============ -->
 <section id="page-result" class="page hidden">
   <h1>📊 สรุปผลการทบทวน</h1>
@@ -122,6 +128,7 @@
 
 <script src="questions.js"></script>
 <script src="questions_extra.js"></script>
+<script src="questions_prof.js"></script>
 <script src="study.js"></script>
 <script src="app.js"></script>
 </body>

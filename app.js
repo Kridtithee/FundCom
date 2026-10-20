@@ -18,7 +18,7 @@ function addWeak(i) { const w = loadWeak(); if (!w.includes(i)) { w.push(i); sav
 function removeWeak(i) { saveWeak(loadWeak().filter(x => x !== i)); }
 
 // ---------- navigation ----------
-const PAGES = ['home', 'study', 'mode', 'flashcard', 'choice', 'result'];
+const PAGES = ['home', 'study', 'mode', 'flashcard', 'choice', 'matching', 'result'];
 function showPage(id) {
   state.page = id;
   PAGES.forEach(p => document.getElementById('page-' + p).classList.toggle('hidden', p !== id));
@@ -91,8 +91,9 @@ function openStudy(topic) {
     <div class="study-cta box">
       <b>พร้อมทบทวน ${stats.total} ข้อของหมวดนี้หรือยัง?</b>
       <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-        <button class="btn-practice" style="flex:1" onclick="playMode('flashcard')">🎴 แฟลชการ์ด</button>
-        <button class="btn-practice" style="flex:1" onclick="playMode('choice')">📝 ปรนัย</button>
+        <button class="btn-practice" style="flex:1;min-width:120px" onclick="playMode('flashcard')">🎴 แฟลชการ์ด</button>
+        <button class="btn-practice" style="flex:1;min-width:120px" onclick="playMode('choice')">📝 ปรนัย</button>
+        <button class="btn-practice" style="flex:1;min-width:120px" onclick="playMode('matching')">🧩 จับคู่</button>
       </div>
     </div>
     <button class="btn-ghost" onclick="renderHome()">← กลับหน้าแรก</button>`;
@@ -111,6 +112,12 @@ function renderSection(sec) {
   else if (sec.type === 'points') inner = `<ul class="pts">${sec.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
   else if (sec.type === 'tips') inner = `<ul class="pts">${sec.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
   else if (sec.type === 'memory') inner = `<p class="memory-text">${sec.text}</p>`;
+  else if (sec.type === 'example') inner = sec.items.map(ex => `
+    <div class="ex-card">
+      <div class="ex-q">❓ ${ex.q}</div>
+      <div class="ex-think"><b>💭 วิธีคิด:</b> ${ex.thinking}</div>
+      <div class="ex-a">✅ คำตอบ: <b>${ex.answer}</b></div>
+    </div>`).join('');
   const cls = sec.type === 'tips' ? 'sec sec-tips' : sec.type === 'memory' ? 'sec sec-memory' : 'sec';
   return `<div class="${cls}"><h2 class="sec-title">${sec.title}</h2>${inner}</div>`;
 }
@@ -132,7 +139,12 @@ function playMode(mode) {
   if (state.currentTopic === 'weak') list = loadWeak();
   else list = topicIndices(state.currentTopic);
   if (list.length === 0) { alert('ยังไม่มีข้อในชุดนี้ครับ'); return; }
-  startWithList(shuffle(list));
+  if (mode === 'matching') {
+    if (list.length < 4) { alert('โหมดจับคู่ต้องมีอย่างน้อย 4 ข้อครับ'); return; }
+    startMatching(shuffle(list));
+  } else {
+    startWithList(shuffle(list));
+  }
 }
 
 function startReviewWeak() {
@@ -147,7 +159,10 @@ function startWithList(list) {
   else { showPage('choice'); renderChoice(); }
 }
 
-function retry() { startWithList(shuffle(state.currentList)); }
+function retry() {
+  if (state.mode === 'matching') startMatching(shuffle(state.currentList));
+  else startWithList(shuffle(state.currentList));
+}
 function goHome() { renderHome(); }
 function resetProgress() {
   if (!confirm('ลบประวัติข้อที่ยังไม่แม่นทั้งหมด?')) return;
@@ -239,6 +254,89 @@ function answerChoice(selected) {
 function nextChoiceCard() { state.index++; renderChoice(); }
 
 // =========================================================
+//  MATCHING
+// =========================================================
+function startMatching(list) {
+  state.currentList = list;
+  state.index = 0;
+  state.weakCards = [];
+  state.matchMistakes = {};
+  showPage('matching');
+  loadMatchBatch();
+}
+
+function loadMatchBatch() {
+  if (state.index >= state.currentList.length) { showResult(); return; }
+  state.matchBatch = state.currentList.slice(state.index, state.index + 4);
+  state.matchSelL = null; state.matchSelR = null; state.matchDone = 0;
+
+  const totalBatches = Math.ceil(state.currentList.length / 4);
+  document.getElementById('matchProgress').textContent =
+    `ชุดที่ ${Math.floor(state.index / 4) + 1} / ${totalBatches} · เหลือ ${state.currentList.length - state.index} ข้อ`;
+  document.getElementById('matchNextBtn').classList.add('hidden');
+
+  const left = document.getElementById('matchLeft');
+  const right = document.getElementById('matchRight');
+  left.innerHTML = ''; right.innerHTML = '';
+
+  state.matchBatch.forEach(qi => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.textContent = QUESTIONS[qi].q;
+    div.dataset.qi = qi;
+    div.onclick = () => selectMatchItem('L', div);
+    left.appendChild(div);
+  });
+  shuffle(state.matchBatch).forEach(qi => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.textContent = QUESTIONS[qi].choices[QUESTIONS[qi].answer];
+    div.dataset.qi = qi;
+    div.onclick = () => selectMatchItem('R', div);
+    right.appendChild(div);
+  });
+}
+
+function selectMatchItem(side, el) {
+  if (el.classList.contains('matched')) return;
+  const col = document.getElementById(side === 'L' ? 'matchLeft' : 'matchRight');
+  col.querySelectorAll('.match-item').forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+  if (side === 'L') state.matchSelL = el; else state.matchSelR = el;
+  if (state.matchSelL && state.matchSelR) checkMatch();
+}
+
+function checkMatch() {
+  const L = state.matchSelL, R = state.matchSelR;
+  const ok = L.dataset.qi === R.dataset.qi;
+  if (ok) {
+    L.classList.add('matched'); R.classList.add('matched');
+    L.classList.remove('selected'); R.classList.remove('selected');
+    state.matchDone++;
+    if (state.matchDone === state.matchBatch.length) {
+      // finalize batch: mistakes -> weak, clean -> mastered
+      state.matchBatch.forEach(qi => {
+        if (state.matchMistakes[qi]) { addWeak(qi); state.weakCards.push(qi); }
+        else removeWeak(qi);
+      });
+      const btn = document.getElementById('matchNextBtn');
+      btn.textContent = (state.index + 4 >= state.currentList.length) ? 'ดูผลลัพธ์ 🎉' : 'ชุดถัดไป →';
+      btn.classList.remove('hidden');
+    }
+  } else {
+    state.matchMistakes[L.dataset.qi] = true;
+    L.classList.add('wrong-flash'); R.classList.add('wrong-flash');
+    setTimeout(() => {
+      L.classList.remove('wrong-flash', 'selected');
+      R.classList.remove('wrong-flash', 'selected');
+    }, 450);
+  }
+  state.matchSelL = null; state.matchSelR = null;
+}
+
+function nextMatchBatch() { state.index += 4; loadMatchBatch(); }
+
+// =========================================================
 //  RESULT
 // =========================================================
 function showResult() {
@@ -248,6 +346,9 @@ function showResult() {
   const correct = total - missed;
   const pct = total ? Math.round(correct / total * 100) : 0;
   const comment = pct >= 80 ? '🎉 สุดยอด! คุณแม่นมาก' : pct >= 50 ? '👍 ดีแล้ว ทบทวนอีกนิดนะ' : '📚 ยังต้องฝึกอีกหน่อย สู้ๆ!';
+  const unit = state.mode === 'matching' ? 'คู่' : 'ข้อ';
+  const goodLabel = state.mode === 'matching' ? 'จับคู่ถูก' : 'จำได้/ตอบถูก';
+  const badLabel = state.mode === 'matching' ? 'จับคู่พลาด' : 'ยังไม่แม่น/ตอบผิด';
   // per-topic breakdown
   const byTopic = {};
   state.currentList.forEach((qi, pos) => {
@@ -265,22 +366,14 @@ function showResult() {
   document.getElementById('resultText').innerHTML = `
     <div class="res-score">${pct}%</div>
     <div class="small" style="text-align:center;margin-bottom:10px">${comment}</div>
-    <div class="small" style="text-align:center">ทบทวน ${total} ข้อ · จำได้ ${correct} ข้อ · ยังไม่แม่น ${missed} ข้อ</div>
+    <div class="small" style="text-align:center">ทบทวน ${total} ${unit} · ${goodLabel} ${correct} ${unit} · ${badLabel} ${missed} ${unit}</div>
     <hr>${rows}`;
 }
 
 // =========================================================
-//  THEME
+//  THEME — locked to dark
 // =========================================================
-function changeTheme(v) {
-  document.documentElement.setAttribute('data-theme', v);
-  localStorage.setItem('fundcom_theme', v);
-}
-function loadTheme() {
-  const t = localStorage.getItem('fundcom_theme') || 'pastel';
-  document.documentElement.setAttribute('data-theme', t);
-  document.getElementById('themeSelector').value = t;
-}
+document.documentElement.setAttribute('data-theme', 'dark');
 
 // =========================================================
 //  KEYBOARD SHORTCUTS
@@ -300,5 +393,4 @@ document.addEventListener('keydown', e => {
 });
 
 // =========================================================
-loadTheme();
 renderHome();
